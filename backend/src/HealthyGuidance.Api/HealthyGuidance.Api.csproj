@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>HealthyGuidance.Api</RootNamespace>
+    <UserSecretsId>healthyguidance-api-dev</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HealthyGuidance.Application\HealthyGuidance.Application.csproj" />
+    <ProjectReference Include="..\HealthyGuidance.Infrastructure\HealthyGuidance.Infrastructure.csproj" />
+    <ProjectReference Include="..\HealthyGuidance.Contracts\HealthyGuidance.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.8.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+  </ItemGroup>
+</Project>
