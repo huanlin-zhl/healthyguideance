@@ -48,7 +48,7 @@ public sealed partial class RecordsPage : Page
         try
         {
             _allSaved = RecordStore.ListAll()
-                .OrderByDescending(r => RecordTimestamp(r))
+                .OrderByDescending(r => r.SavedAt)
                 .ToList();
             _allFailed = RecordStore.ListAllFailed()
                 .OrderByDescending(r => r.SavedAt)
@@ -83,11 +83,11 @@ public sealed partial class RecordsPage : Page
                 if (filter == "body" && r.Kind != RecordKind.BodyMetrics) continue;
                 try
                 {
-                    items.Add((RecordTimestamp(r), BuildSavedExpander(r)));
+                    items.Add((r.SavedAt, BuildSavedExpander(r)));
                 }
                 catch (Exception ex)
                 {
-                    items.Add((RecordTimestamp(r), BuildErrorExpander(r.Id, ex)));
+                    items.Add((r.SavedAt, BuildErrorExpander(r.Id, ex)));
                 }
             }
         }
@@ -186,16 +186,6 @@ public sealed partial class RecordsPage : Page
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
             Content = view.Root
         };
-    }
-
-    private static DateTime RecordTimestamp(SavedRecord r)
-    {
-        var key = r.Kind == RecordKind.Workout ? "date_time" : "measured_at";
-        if (r.Data[key] is System.Text.Json.Nodes.JsonValue v
-            && v.GetValueKind() == System.Text.Json.JsonValueKind.String
-            && DateTime.TryParse(v.GetValue<string>(), out var dt))
-            return dt;
-        return r.SavedAt;
     }
 
     // ============================================================
