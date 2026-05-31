@@ -1,5 +1,6 @@
 using HealthyGuidance.Core.AzureOpenAI;
 using HealthyGuidance.Core.Prompts;
+using HealthyGuidance.Core.Reports;
 using HealthyGuidance.Core.Schemas;
 using HealthyGuidance.Core.Settings;
 using HealthyGuidance.Core.Storage;
@@ -17,14 +18,13 @@ using WinRT.Interop;
 
 namespace HealthyGuidance.App;
 
-public sealed partial class MainWindow : Window
+public sealed partial class DevPanelWindow : Window
 {
     private const string ApiVersion = "v1";
 
     private string _cachedSystemPrompt = string.Empty;
-    private SettingsWindow? _settingsWindow;
 
-    public MainWindow()
+    public DevPanelWindow()
     {
         InitializeComponent();
         LoadPromptIntoUi();
@@ -32,20 +32,6 @@ public sealed partial class MainWindow : Window
         var now = DateTime.Now;
         BrowseMonthBox.Text = now.ToString("yyyy-MM");
         NotesMonthBox.Text = now.ToString("yyyy-MM");
-    }
-
-    private void SettingsButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_settingsWindow != null)
-        {
-            _settingsWindow.Activate();
-            return;
-        }
-
-        _settingsWindow = new SettingsWindow();
-        _settingsWindow.Closed += (_, _) => _settingsWindow = null;
-        _settingsWindow.Saved += (_, _) => GlobalStatusText.Text = "设置已保存";
-        _settingsWindow.Activate();
     }
 
     private void OpenDataFolderButton_Click(object sender, RoutedEventArgs e)
@@ -401,5 +387,78 @@ public sealed partial class MainWindow : Window
             _ => Confidence.Low
         };
         return (TimestampSource.Extracted, missing, confidence);
+    }
+
+    // ---------- ⑥ Advice ----------
+    private void AdvicePreviewButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var ctx = BuildAdviceContext();
+            AdvicePromptBox.Text = ctx.Prompt;
+            AdviceStatus.Text = $"窗口内：体成分 {ctx.BodyMetricsCount} · 运动 {ctx.WorkoutCount} · 备注 {ctx.NoteCount}";
+        }
+        catch (Exception ex)
+        {
+            AdvicePromptBox.Text = ex.ToString();
+            AdviceStatus.Text = "出错：" + ex.Message;
+        }
+    }
+
+    private async void AdviceCallButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            AdviceCallButton.IsEnabled = false;
+            AdvicePreviewButton.IsEnabled = false;
+
+            var settings = SettingsStore.Load();
+            if (!settings.IsConfigured)
+            {
+                AdviceStatus.Text = "请先在 ⚙ 设置 中配置 Endpoint / Deployment / API Key";
+                return;
+            }
+
+            var ctx = BuildAdviceContext();
+            AdvicePromptBox.Text = ctx.Prompt;
+            AdviceStatus.Text = $"调用 {settings.DeploymentName}（窗口内：体成分 {ctx.BodyMetricsCount} · 运动 {ctx.WorkoutCount} · 备注 {ctx.NoteCount}）...";
+
+            var sharedRoot = Path.Combine(AppContext.BaseDirectory, "shared");
+            var schema = SchemaLoader.LoadInlined(sharedRoot, "advice-result.json");
+            var client = new AdviceClient(settings.Endpoint, settings.ApiKey, settings.DeploymentName);
+
+            var json = await client.GenerateAsync(ctx.Prompt, schema);
+            AdviceResponseBox.Text = json;
+            AdviceStatus.Text = "完成";
+        }
+        catch (Exception ex)
+        {
+            AdviceResponseBox.Text = ex.ToString();
+            AdviceStatus.Text = "出错：" + ex.Message;
+        }
+        finally
+        {
+            AdviceCallButton.IsEnabled = true;
+            AdvicePreviewButton.IsEnabled = true;
+        }
+    }
+
+    private AdviceContext BuildAdviceContext()
+    {
+        var days = AdviceWindow7.IsChecked == true ? 7
+                 : AdviceWindow90.IsChecked == true ? 90
+                 : 30;
+        var now = DateTime.Now;
+        var start = new DateTime(now.Year, now.Month, now.Day).AddDays(-days);
+        var sharedRoot = Path.Combine(AppContext.BaseDirectory, "shared");
+
+        return AdviceContextBuilder.Build(sharedRoot, new AdviceContextInputs
+        {
+            CurrentTime = now,
+            WindowStart = start,
+            WindowEnd = now,
+            GoalWeightKg = AdviceGoalWeightBox.Value,
+            GoalBodyFatPct = AdviceGoalBodyFatBox.Value
+        });
     }
 }

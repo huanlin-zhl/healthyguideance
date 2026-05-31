@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["summary", "trend", "diet_advice", "workout_advice", "warnings"],
+  "properties": {
+    "summary":         { "type": "string", "description": "现状小结：时间窗口内体重 / 体脂率 / 内脏脂肪变化与运动总量。" },
+    "trend":           { "type": "string", "description": "趋势判断：变好 / 变差 / 停滞，简要原因。" },
+    "diet_advice":     { "type": "string", "description": "饮食建议：基于备注与体成分趋势的方向性建议。" },
+    "workout_advice":  { "type": "string", "description": "运动建议：下周建议频次、类型、强度。" },
+    "warnings":        { "type": "string", "description": "注意事项：异常项。无异常时返回空字符串。" }
+  }
+}
