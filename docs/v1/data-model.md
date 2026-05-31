@@ -115,37 +115,13 @@ date_time, sport_type, duration_text, calories_text
 | `weight_kg` | number | ✅ | kg | 体重 |
 | `bmi` | number \| null | ❌ | — | BMI |
 | `body_fat_pct` | number \| null | ❌ | % | 体脂率 |
-| `skeletal_muscle_kg` | number \| null | ❌ | kg | 骨骼肌量 |
 | `visceral_fat_level` | number \| null | ❌ | 级 | 内脏脂肪等级 |
-| `limb_skeletal_muscle_index` | number \| null | ❌ | kg/m² | 四肢骨骼肌指数 |
-| `waist_hip_ratio_est` | number \| null | ❌ | — | 推测腰臀比 |
-| `body_age` | integer \| null | ❌ | 岁 | 身体年龄 |
-| `heart_rate_bpm` | integer \| null | ❌ | bpm | 心率 |
-| `water_pct` | number \| null | ❌ | % | 水分率 |
-| `bone_salt_kg` | number \| null | ❌ | kg | 骨盐量 |
-| `protein_pct` | number \| null | ❌ | % | 蛋白质 |
-| `lean_body_mass_kg` | number \| null | ❌ | kg | 去脂体重 |
-| `body_type` | string \| null | ❌ | — | 身体类型（原文，如`肥胖型`） |
-| `body_shape` | string \| null | ❌ | — | 身体形态（原文，如`苹果型`） |
-| `muscle_distribution` | object \| null | ❌ | kg | 分肢骨骼肌量（来自"骨骼肌 XX 公斤"那张图） |
-| `muscle_distribution.right_arm` | number | — | kg | 右上肢 |
-| `muscle_distribution.left_arm` | number | — | kg | 左上肢 |
-| `muscle_distribution.trunk` | number | — | kg | 躯干 |
-| `muscle_distribution.right_leg` | number | — | kg | 右下肢 |
-| `muscle_distribution.left_leg` | number | — | kg | 左下肢 |
-| `fat_distribution` | object \| null | ❌ | kg | 分肢脂肪量（来自"脂肪 XX 公斤"那张图） |
-| `fat_distribution.right_arm` | number | — | kg | 右上肢 |
-| `fat_distribution.left_arm` | number | — | kg | 左上肢 |
-| `fat_distribution.trunk` | number | — | kg | 躯干 |
-| `fat_distribution.right_leg` | number | — | kg | 右下肢 |
-| `fat_distribution.left_leg` | number | — | kg | 左下肢 |
-| `body_score` | integer \| null | ❌ | — | 身体得分（如华为的"71 分"） |
-| `source_app` | string \| null | ❌ | — | 数据来源 app |
-| `device` | string \| null | ❌ | — | 设备型号 |
+| `skeletal_muscle_kg` | number \| null | ❌ | kg | 骨骼肌量 |
+| `heart_rate_bpm` | integer \| null | ❌ | bpm | 静息心率（体脂秤测量时） |
 
 ### 5.2 JSON Schema（草案）
 
-结构同 §4.2，每个字段 `"type": ["...", "null"]` 表达可选。`muscle_distribution` 嵌套对象的 5 个子字段（`right_arm` / `left_arm` / `trunk` / `right_leg` / `left_leg`）均为必需。完整 JSON 略，写代码时按 §4.2 模式生成。
+结构同 §4.2：所有 properties 在 `required` 中列出，可选字段通过 `"type": ["...", "null"]` 表达。完整定义见 [shared/schemas/body-metrics.json](../../shared/schemas/body-metrics.json)。
 
 ### 5.3 必需字段（用于置信度推断）
 
