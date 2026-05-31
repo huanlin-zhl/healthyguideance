@@ -6,8 +6,28 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <StackPanel Padding="24" Spacing="12">
-        <TextBlock Text="概览" FontSize="28" FontWeight="SemiBold" />
-        <TextBlock Text="（最近报告 + 最近记录时间线，待实现）" Opacity="0.6" />
-    </StackPanel>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24,16,24,24">
+        <StackPanel x:Name="RootPanel" Spacing="20" HorizontalAlignment="Stretch">
+
+            <TextBlock Text="概览" FontSize="28" FontWeight="SemiBold" />
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="最近报告"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Opacity="0.85" />
+                <StackPanel x:Name="LatestReportSlot" />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="健康历程"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Opacity="0.85" />
+                <StackPanel x:Name="TimelineSlot" Spacing="8" />
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
 </Page>

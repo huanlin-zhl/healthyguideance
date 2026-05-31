@@ -21,6 +21,8 @@ public sealed partial class RecordsPage : Page
 {
     private List<SavedRecord> _allSaved = new();
     private List<FailedRecord> _allFailed = new();
+    private readonly Dictionary<string, Expander> _expandersById = new();
+    private string? _pendingHighlightId;
 
     public RecordsPage()
     {
@@ -31,6 +33,18 @@ public sealed partial class RecordsPage : Page
     protected override void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
+        if (e.Parameter is string id && !string.IsNullOrEmpty(id) && id != "unconfigured")
+        {
+            _pendingHighlightId = id;
+            // 推迟到 Loaded 之后（首次进入）或当前帧渲染完成后（页面已存在）。
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+            {
+                if (RecordsPanel is null) return;
+                if (_expandersById.Count == 0) Reload();
+                else ApplyPendingHighlight();
+            });
+            return;
+        }
         if (RecordsPanel is not null) Reload();
     }
 
@@ -71,6 +85,7 @@ public sealed partial class RecordsPage : Page
     {
         if (RecordsPanel is null) return;
         RecordsPanel.Children.Clear();
+        _expandersById.Clear();
 
         var filter = CurrentFilter();
         var items = new List<(DateTime when, UIElement element)>();
@@ -123,6 +138,35 @@ public sealed partial class RecordsPage : Page
                 Opacity = 0.6
             });
         }
+
+        ApplyPendingHighlight();
+    }
+
+    private void ApplyPendingHighlight()
+    {
+        if (_pendingHighlightId is null) return;
+        if (!_expandersById.TryGetValue(_pendingHighlightId, out var exp))
+        {
+            // 命中失败：当前筛选可能把它过滤掉了。切回「全部」再试一次。
+            if (CurrentFilter() != "all" && FilterAll is not null)
+            {
+                FilterAll.IsChecked = true; // 触发 Filter_Checked → RenderList → 再走到这里
+                return;
+            }
+            _pendingHighlightId = null;
+            return;
+        }
+        var target = exp;
+        var id = _pendingHighlightId;
+        _pendingHighlightId = null;
+
+        target.IsExpanded = true;
+        // 等 layout 完成后再滚到视图
+        DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () =>
+        {
+            try { target.StartBringIntoView(new BringIntoViewOptions { AnimationDesired = true }); }
+            catch { }
+        });
     }
 
     private static Expander BuildErrorExpander(string id, Exception ex)
@@ -164,13 +208,15 @@ public sealed partial class RecordsPage : Page
             },
             onDeleted: () => Reload());
 
-        return new Expander
+        var exp = new Expander
         {
             Header = view.BuildHeader(),
             HorizontalAlignment = HorizontalAlignment.Stretch,
             HorizontalContentAlignment = HorizontalAlignment.Stretch,
             Content = view.Root
         };
+        _expandersById[r.Id] = exp;
+        return exp;
     }
 
     private Expander BuildFailedExpander(FailedRecord r)

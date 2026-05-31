@@ -48,7 +48,19 @@ public sealed partial class MainWindow : Window
             NavigateTo(tag);
     }
 
-    private void NavigateTo(string tag, bool showUnconfiguredHint = false)
+    public void NavigateFromHost(string tag) => NavigateFromHost(tag, null);
+
+    public void NavigateFromHost(string tag, object? parameter)
+    {
+        var item = NavView.MenuItems.OfType<NavigationViewItem>()
+            .FirstOrDefault(i => (i.Tag as string) == tag);
+        if (item is not null) NavView.SelectedItem = item;
+        NavigateTo(tag, parameter: parameter);
+    }
+
+    public void TriggerImport() => ImportButton_Click(this, new RoutedEventArgs());
+
+    private void NavigateTo(string tag, bool showUnconfiguredHint = false, object? parameter = null)
     {
         Type? pageType = tag switch
         {
@@ -60,10 +72,11 @@ public sealed partial class MainWindow : Window
             _ => null
         };
         if (pageType is null) return;
+
+        var navParam = parameter ?? (showUnconfiguredHint ? "unconfigured" : null);
         var alreadyThere = ContentFrame.CurrentSourcePageType == pageType;
-        if (!alreadyThere)
-            ContentFrame.Navigate(pageType, showUnconfiguredHint ? "unconfigured" : null,
-                new EntranceNavigationTransitionInfo());
+        if (!alreadyThere || parameter is not null)
+            ContentFrame.Navigate(pageType, navParam, new EntranceNavigationTransitionInfo());
         else if (showUnconfiguredHint && ContentFrame.Content is SettingsPage existing)
             existing.ShowUnconfiguredHint();
     }
