@@ -42,30 +42,30 @@ shared/schemas/
 |---|---|---|---|---|
 | `date_time` | string (ISO 8601) | ✅ | — | 运动开始时间 |
 | `sport_type` | string | ✅ | — | 运动类型，按截图原文（`户外骑行` / `泳池游泳` / `自由训练` / `跑步` 等） |
-| `duration_sec` | integer | ✅ | 秒 | 运动总时长 |
-| `calories` | integer | ✅ | 千卡 | 消耗热量 |
-| `avg_heart_rate` | integer \| null | ❌ | bpm | 平均心率 |
-| `max_heart_rate` | integer \| null | ❌ | bpm | 最大心率 |
+| `duration_text` | string | ✅ | — | 运动总时长原文（如 `01:34:26` / `46分5秒`），客户端自行解析 |
+| `calories_text` | string | ✅ | — | 消耗热量原文（如 `861 千卡`） |
+| `avg_heart_rate` | integer \| null | ❌ | bpm | 平均心率（纯数字） |
+| `max_heart_rate` | integer \| null | ❌ | bpm | 最大心率（纯数字） |
 | `hr_zones` | object \| null | ❌ | 各项分钟 | 心率区间分布 |
 | `hr_zones.extreme` | integer | — | 分钟 | 极限 |
 | `hr_zones.anaerobic` | integer | — | 分钟 | 无氧耐力 |
 | `hr_zones.aerobic` | integer | — | 分钟 | 有氧耐力 |
 | `hr_zones.fat_burn` | integer | — | 分钟 | 燃脂 |
 | `hr_zones.warmup` | integer | — | 分钟 | 热身 |
-| `aerobic_te` | number \| null | ❌ | — | 有氧训练压力 |
-| `recovery_hours` | integer \| null | ❌ | 小时 | 恢复时间 |
-| `distance_m` | integer \| null | ❌ | 米 | 距离（适用于骑/游/跑） |
-| `avg_pace_or_speed` | string \| null | ❌ | — | 配速或平均速度，原文（`5'46"/km` 或 `19.60 km/h`） |
-| `ascent_m` | integer \| null | ❌ | 米 | 累计爬升（骑行/跑步） |
-| `descent_m` | integer \| null | ❌ | 米 | 累计下降（骑行/跑步） |
-| `max_speed` | number \| null | ❌ | km/h | 最快速度（骑行） |
-| `min_speed` | number \| null | ❌ | km/h | 最慢速度（骑行） |
+| `aerobic_te` | number \| null | ❌ | — | 有氧训练压力（纯数字） |
+| `recovery_text` | string \| null | ❌ | — | 恢复时间原文（如 `17 小时`） |
+| `distance_text` | string \| null | ❌ | — | 距离原文（如 `30.85 公里` / `1000 米`） |
+| `avg_pace_or_speed` | string \| null | ❌ | — | 配速或平均速度原文（`5'46"/km` 或 `19.60 km/h`） |
+| `ascent_text` | string \| null | ❌ | — | 累计爬升原文（如 `87.0 米`） |
+| `descent_text` | string \| null | ❌ | — | 累计下降原文（如 `96.8 米`） |
+| `max_speed_text` | string \| null | ❌ | — | 最快速度原文（如 `37.08 公里/小时`） |
+| `min_speed_text` | string \| null | ❌ | — | 最慢速度原文（如 `3.24 公里/小时`） |
 | `stroke` | string \| null | ❌ | — | 主泳姿（`蛙泳`/`自由泳`/`仰泳`/`蝶泳`） |
-| `pool_length_m` | integer \| null | ❌ | 米 | 泳池长度 |
-| `laps` | integer \| null | ❌ | — | 趟数 |
-| `stroke_count` | integer \| null | ❌ | — | 划水次数 |
-| `stroke_rate` | integer \| null | ❌ | 次/分钟 | 划水频率 |
-| `swolf` | integer \| null | ❌ | — | 游泳效率指标 |
+| `pool_length_text` | string \| null | ❌ | — | 泳池长度原文（如 `25 米`） |
+| `laps` | integer \| null | ❌ | — | 趟数（纯数字） |
+| `stroke_count` | integer \| null | ❌ | — | 划水次数（纯数字） |
+| `stroke_rate` | integer \| null | ❌ | 次/分钟 | 划水频率（纯数字） |
+| `swolf` | integer \| null | ❌ | — | 游泳效率指标（纯数字） |
 | `source_app` | string \| null | ❌ | — | 数据来源 app（`华为运动健康` 等） |
 | `device` | string \| null | ❌ | — | 设备型号（`HUAWEI WATCH GT 3 Pro` 等） |
 
@@ -80,8 +80,8 @@ shared/schemas/
   "properties": {
     "date_time":         { "type": "string", "format": "date-time" },
     "sport_type":        { "type": "string" },
-    "duration_sec":      { "type": "integer" },
-    "calories":          { "type": "integer" },
+    "duration_text":     { "type": "string" },
+    "calories_text":     { "type": "string" },
     "avg_heart_rate":    { "type": ["integer", "null"] },
     "max_heart_rate":    { "type": ["integer", "null"] },
     "hr_zones": {
@@ -97,15 +97,15 @@ shared/schemas/
       "required": ["extreme", "anaerobic", "aerobic", "fat_burn", "warmup"]
     },
     "aerobic_te":         { "type": ["number", "null"] },
-    "recovery_hours":     { "type": ["integer", "null"] },
-    "distance_m":         { "type": ["integer", "null"] },
+    "recovery_text":      { "type": ["string", "null"] },
+    "distance_text":      { "type": ["string", "null"] },
     "avg_pace_or_speed":  { "type": ["string", "null"] },
-    "ascent_m":           { "type": ["integer", "null"] },
-    "descent_m":          { "type": ["integer", "null"] },
-    "max_speed":          { "type": ["number", "null"] },
-    "min_speed":          { "type": ["number", "null"] },
+    "ascent_text":        { "type": ["string", "null"] },
+    "descent_text":       { "type": ["string", "null"] },
+    "max_speed_text":     { "type": ["string", "null"] },
+    "min_speed_text":     { "type": ["string", "null"] },
     "stroke":             { "type": ["string", "null"] },
-    "pool_length_m":      { "type": ["integer", "null"] },
+    "pool_length_text":   { "type": ["string", "null"] },
     "laps":               { "type": ["integer", "null"] },
     "stroke_count":       { "type": ["integer", "null"] },
     "stroke_rate":        { "type": ["integer", "null"] },
@@ -114,12 +114,12 @@ shared/schemas/
     "device":             { "type": ["string", "null"] }
   },
   "required": [
-    "date_time", "sport_type", "duration_sec", "calories",
+    "date_time", "sport_type", "duration_text", "calories_text",
     "avg_heart_rate", "max_heart_rate", "hr_zones",
-    "aerobic_te", "recovery_hours",
-    "distance_m", "avg_pace_or_speed",
-    "ascent_m", "descent_m", "max_speed", "min_speed",
-    "stroke", "pool_length_m", "laps", "stroke_count", "stroke_rate", "swolf",
+    "aerobic_te", "recovery_text",
+    "distance_text", "avg_pace_or_speed",
+    "ascent_text", "descent_text", "max_speed_text", "min_speed_text",
+    "stroke", "pool_length_text", "laps", "stroke_count", "stroke_rate", "swolf",
     "source_app", "device"
   ]
 }
@@ -132,7 +132,7 @@ shared/schemas/
 口径上"必需"的字段（缺则记录意义大打折扣）：
 
 ```
-date_time, sport_type, duration_sec, calories
+date_time, sport_type, duration_text, calories_text
 ```
 
 这 4 个缺任何一个 → 视为低置信度（UI 黄色 ⚠）。其他字段缺失正常。

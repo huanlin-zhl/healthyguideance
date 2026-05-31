@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "workout.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "date_time":         { "type": "string", "description": "运动开始时间，ISO 8601 不带时区" },
+    "sport_type":        { "type": "string", "description": "运动类型原文，如 户外骑行 / 泳池游泳 / 自由训练 / 跑步" },
+    "duration_text":     { "type": "string", "description": "运动总时长原文，如 01:34:26 / 46分5秒 / 1:37:12" },
+    "calories_text":     { "type": "string", "description": "消耗热量原文，如 861 千卡 / 406 kcal" },
+    "avg_heart_rate":    { "type": ["integer", "null"], "description": "平均心率，bpm（纯数字，单位固定）" },
+    "max_heart_rate":    { "type": ["integer", "null"], "description": "最大心率，bpm（纯数字，单位固定）" },
+    "hr_zones": {
+      "type": ["object", "null"],
+      "description": "心率区间分布，单位分钟；截图未提供则整体填 null",
+      "additionalProperties": false,
+      "properties": {
+        "extreme":   { "type": "integer", "description": "极限" },
+        "anaerobic": { "type": "integer", "description": "无氧耐力" },
+        "aerobic":   { "type": "integer", "description": "有氧耐力" },
+        "fat_burn":  { "type": "integer", "description": "燃脂" },
+        "warmup":    { "type": "integer", "description": "热身" }
+      },
+      "required": ["extreme", "anaerobic", "aerobic", "fat_burn", "warmup"]
+    },
+    "aerobic_te":        { "type": ["number", "null"], "description": "有氧训练压力（纯数字）" },
+    "recovery_text":     { "type": ["string", "null"], "description": "恢复时间原文，如 17 小时 / 8 小时" },
+    "distance_text":     { "type": ["string", "null"], "description": "距离原文，如 30.85 公里 / 1000 米" },
+    "avg_pace_or_speed": { "type": ["string", "null"], "description": "配速或平均速度原文，如 5'46\"/km 或 19.60 km/h" },
+    "ascent_text":       { "type": ["string", "null"], "description": "累计爬升原文，如 87.0 米" },
+    "descent_text":      { "type": ["string", "null"], "description": "累计下降原文，如 96.8 米" },
+    "max_speed_text":    { "type": ["string", "null"], "description": "最快速度原文，如 37.08 公里/小时" },
+    "min_speed_text":    { "type": ["string", "null"], "description": "最慢速度原文，如 3.24 公里/小时" },
+    "stroke":            { "type": ["string", "null"], "description": "主泳姿原文，如 蛙泳 / 自由泳 / 仰泳 / 蝶泳" },
+    "pool_length_text":  { "type": ["string", "null"], "description": "泳池长度原文，如 25 米 / 50 米" },
+    "laps":              { "type": ["integer", "null"], "description": "趟数（纯数字）" },
+    "stroke_count":      { "type": ["integer", "null"], "description": "划水次数（纯数字）" },
+    "stroke_rate":       { "type": ["integer", "null"], "description": "划水频率，次/分钟（纯数字）" },
+    "swolf":             { "type": ["integer", "null"], "description": "游泳效率指标（纯数字）" },
+    "source_app":        { "type": ["string", "null"], "description": "数据来源 app，如 华为运动健康" },
+    "device":            { "type": ["string", "null"], "description": "设备型号，如 HUAWEI WATCH GT 3 Pro" }
+  },
+  "required": [
+    "date_time", "sport_type", "duration_text", "calories_text",
+    "avg_heart_rate", "max_heart_rate", "hr_zones",
+    "aerobic_te", "recovery_text",
+    "distance_text", "avg_pace_or_speed",
+    "ascent_text", "descent_text", "max_speed_text", "min_speed_text",
+    "stroke", "pool_length_text", "laps", "stroke_count", "stroke_rate", "swolf",
+    "source_app", "device"
+  ]
+}

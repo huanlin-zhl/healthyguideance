@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "parse-result.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": ["workout", "body-metrics", "unknown"],
+      "description": "截图类型：workout=运动；body-metrics=体成分；unknown=无法识别"
+    },
+    "workout": {
+      "$ref": "workout.json",
+      "description": "kind=workout 时填；其他情况填 null"
+    },
+    "body_metrics": {
+      "$ref": "body-metrics.json",
+      "description": "kind=body-metrics 时填；其他情况填 null"
+    },
+    "error_reason": {
+      "type": ["string", "null"],
+      "description": "kind=unknown 时填简短原因；其他情况填 null"
+    }
+  },
+  "required": ["kind", "workout", "body_metrics", "error_reason"]
+}
