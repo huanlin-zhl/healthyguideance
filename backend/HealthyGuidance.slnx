@@ -1,9 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="src/HealthyGuidance.Api/HealthyGuidance.Api.csproj" />
-    <Project Path="src/HealthyGuidance.Application/HealthyGuidance.Application.csproj" />
-    <Project Path="src/HealthyGuidance.Contracts/HealthyGuidance.Contracts.csproj" />
-    <Project Path="src/HealthyGuidance.Domain/HealthyGuidance.Domain.csproj" />
-    <Project Path="src/HealthyGuidance.Infrastructure/HealthyGuidance.Infrastructure.csproj" />
-  </Folder>
-</Solution>

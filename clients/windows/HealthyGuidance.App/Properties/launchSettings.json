@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "HealthyGuidance.App (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "HealthyGuidance.App (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
