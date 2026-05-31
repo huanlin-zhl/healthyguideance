@@ -44,7 +44,7 @@ public static class RecordFormatter
         record.Kind switch
         {
             RecordKind.Workout => BuildGroups(FormatExpanded(record)),
-            RecordKind.BodyMetrics => BuildGroups(FormatExpanded(record), longTextKeys: new[] { "体脂秤小结" }),
+            RecordKind.BodyMetrics => BuildGroups(FormatExpanded(record)),
             _ => Array.Empty<FieldGroup>()
         };
 

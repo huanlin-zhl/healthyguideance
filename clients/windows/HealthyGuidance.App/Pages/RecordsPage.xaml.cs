@@ -522,7 +522,6 @@ public sealed partial class RecordsPage : Page
                     Text = initial,
                     PlaceholderText = "—",
                     TextWrapping = TextWrapping.Wrap,
-                    AcceptsReturn = def.Key == "app_summary_text",
                     HorizontalAlignment = HorizontalAlignment.Stretch
                 };
                 editor = tb;

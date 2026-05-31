@@ -121,7 +121,6 @@ date_time, sport_type, duration_text, calories_text
 | `waist_hip_ratio_est` | number \| null | ❌ | — | 推测腰臀比 |
 | `body_age` | integer \| null | ❌ | 岁 | 身体年龄 |
 | `heart_rate_bpm` | integer \| null | ❌ | bpm | 心率 |
-| `bmr_kcal` | integer \| null | ❌ | 千卡/日 | 基础代谢率 |
 | `water_pct` | number \| null | ❌ | % | 水分率 |
 | `bone_salt_kg` | number \| null | ❌ | kg | 骨盐量 |
 | `protein_pct` | number \| null | ❌ | % | 蛋白质 |
@@ -141,7 +140,6 @@ date_time, sport_type, duration_text, calories_text
 | `fat_distribution.right_leg` | number | — | kg | 右下肢 |
 | `fat_distribution.left_leg` | number | — | kg | 左下肢 |
 | `body_score` | integer \| null | ❌ | — | 身体得分（如华为的"71 分"） |
-| `app_summary_text` | string \| null | ❌ | — | 体脂秤 app 自带的中文小结，**仅存档不参与分析** |
 | `source_app` | string \| null | ❌ | — | 数据来源 app |
 | `device` | string \| null | ❌ | — | 设备型号 |
 
