@@ -4,154 +4,78 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:HealthyGuidance.App"
+    xmlns:pages="using:HealthyGuidance.App.Pages"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="HealthyGuidance - 测试面板">
+    Title="HealthyGuidance">
 
     <Window.SystemBackdrop>
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <NavigationView x:Name="NavView"
+                    IsBackButtonVisible="Collapsed"
+                    IsSettingsVisible="True"
+                    PaneDisplayMode="Left"
+                    SelectionChanged="NavView_SelectionChanged">
+        <NavigationView.MenuItems>
+            <NavigationViewItem Content="概览" Tag="overview">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE80F;" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem Content="记录" Tag="records">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE8FD;" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem Content="备注" Tag="notes">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE70B;" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem Content="报告" Tag="reports">
+                <NavigationViewItem.Icon>
+                    <FontIcon Glyph="&#xE9D9;" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.MenuItems>
 
-        <StackPanel Grid.Row="0"
-                    Orientation="Horizontal"
-                    Spacing="12"
-                    Padding="16,12">
-            <Button x:Name="SettingsButton" Content="⚙ 设置" Click="SettingsButton_Click" />
-            <Button x:Name="ReloadPromptButton" Content="重新加载 Prompt" Click="ReloadPromptButton_Click" />
-            <Button x:Name="OpenDataFolderButton" Content="📂 打开数据目录" Click="OpenDataFolderButton_Click" />
-            <TextBlock x:Name="GlobalStatusText" VerticalAlignment="Center" Text="就绪" Opacity="0.7" />
-        </StackPanel>
+        <NavigationView.PaneFooter>
+            <StackPanel />
+        </NavigationView.PaneFooter>
 
-        <ScrollViewer Grid.Row="1"
-                      VerticalScrollBarVisibility="Auto"
-                      Padding="16,0,16,16">
-            <StackPanel Spacing="20" MaxWidth="900" HorizontalAlignment="Stretch">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-                <!-- Panel: System prompt preview -->
-                <Expander HorizontalAlignment="Stretch" IsExpanded="False">
-                    <Expander.Header>
-                        <TextBlock x:Name="PromptHeader" Text="System Prompt（点击展开）" FontWeight="SemiBold" />
-                    </Expander.Header>
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="280">
-                        <TextBox x:Name="PromptBox"
-                                 IsReadOnly="True"
-                                 AcceptsReturn="True"
-                                 TextWrapping="NoWrap"
-                                 FontFamily="Consolas"
-                                 FontSize="12" />
-                    </ScrollViewer>
-                </Expander>
+            <CommandBar Grid.Row="0"
+                        Background="Transparent"
+                        DefaultLabelPosition="Right"
+                        HorizontalAlignment="Right"
+                        IsOpen="False"
+                        OverflowButtonVisibility="Collapsed"
+                        Padding="0,4,12,4">
+                <AppBarButton x:Name="ImportButton"
+                              Label="导入截图"
+                              Click="ImportButton_Click">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xE898;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="AddNoteButton"
+                              Label="写备注"
+                              Click="AddNoteButton_Click">
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xE70F;" />
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </CommandBar>
 
-                <!-- Panel 1: Parse only (existing) -->
-                <Border Padding="16" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="① 解析截图（不落盘）" FontSize="16" FontWeight="SemiBold" />
-                        <TextBlock Text="选一张截图，调用 GPT，仅显示返回 JSON，不写入磁盘。" Opacity="0.7" FontSize="12" />
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Button x:Name="ParseOnlyButton" Content="选择截图并解析" Click="ParseOnlyButton_Click" />
-                            <TextBlock x:Name="ParseOnlyStatus" VerticalAlignment="Center" Opacity="0.7" />
-                        </StackPanel>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="260">
-                            <TextBox x:Name="ParseOnlyResultBox"
-                                     IsReadOnly="True"
-                                     AcceptsReturn="True"
-                                     TextWrapping="NoWrap"
-                                     FontFamily="Consolas"
-                                     FontSize="12"
-                                     MinHeight="120" />
-                        </ScrollViewer>
-                    </StackPanel>
-                </Border>
-
-                <!-- Panel 2: Parse + persist -->
-                <Border Padding="16" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="② 解析 + 落盘（成功走 records/，失败走 failed/）" FontSize="16" FontWeight="SemiBold" />
-                        <TextBlock Text="选截图 → 调用 GPT → 写入 RecordStore；重复同一张图会跳过。" Opacity="0.7" FontSize="12" />
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Button x:Name="ParseAndSaveButton" Content="选择截图并落盘" Click="ParseAndSaveButton_Click" />
-                            <TextBlock x:Name="ParseAndSaveStatus" VerticalAlignment="Center" Opacity="0.7" />
-                        </StackPanel>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="260">
-                            <TextBox x:Name="ParseAndSaveResultBox"
-                                     IsReadOnly="True"
-                                     AcceptsReturn="True"
-                                     TextWrapping="NoWrap"
-                                     FontFamily="Consolas"
-                                     FontSize="12"
-                                     MinHeight="120" />
-                        </ScrollViewer>
-                    </StackPanel>
-                </Border>
-
-                <!-- Panel 3: Notes append -->
-                <Border Padding="16" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="③ 写入饮食备注" FontSize="16" FontWeight="SemiBold" />
-                        <TextBlock Text="时间戳用当前时刻，到分钟；按当前月归档到 notes/&lt;yyyy-MM&gt;.txt" Opacity="0.7" FontSize="12" />
-                        <TextBox x:Name="NoteInputBox"
-                                 PlaceholderText="今天中午吃了..."
-                                 AcceptsReturn="True"
-                                 TextWrapping="Wrap"
-                                 MinHeight="80" />
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <Button x:Name="AppendNoteButton" Content="追加备注" Click="AppendNoteButton_Click" />
-                            <TextBlock x:Name="AppendNoteStatus" VerticalAlignment="Center" Opacity="0.7" />
-                        </StackPanel>
-                    </StackPanel>
-                </Border>
-
-                <!-- Panel 4: Browse records -->
-                <Border Padding="16" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="④ 浏览记录" FontSize="16" FontWeight="SemiBold" />
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="月份(YYYY-MM)：" VerticalAlignment="Center" />
-                            <TextBox x:Name="BrowseMonthBox" Width="120" />
-                            <Button x:Name="ListRecordsButton" Content="列出成功记录" Click="ListRecordsButton_Click" />
-                            <Button x:Name="ListFailedButton" Content="列出失败记录" Click="ListFailedButton_Click" />
-                        </StackPanel>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="220">
-                            <TextBox x:Name="BrowseRecordsBox"
-                                     IsReadOnly="True"
-                                     AcceptsReturn="True"
-                                     TextWrapping="NoWrap"
-                                     FontFamily="Consolas"
-                                     FontSize="12"
-                                     MinHeight="100" />
-                        </ScrollViewer>
-                    </StackPanel>
-                </Border>
-
-                <!-- Panel 5: Browse notes -->
-                <Border Padding="16" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="⑤ 浏览备注" FontSize="16" FontWeight="SemiBold" />
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="月份(YYYY-MM)：" VerticalAlignment="Center" />
-                            <TextBox x:Name="NotesMonthBox" Width="120" />
-                            <Button x:Name="ListNotesButton" Content="列出备注" Click="ListNotesButton_Click" />
-                        </StackPanel>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="220">
-                            <TextBox x:Name="BrowseNotesBox"
-                                     IsReadOnly="True"
-                                     AcceptsReturn="True"
-                                     TextWrapping="Wrap"
-                                     FontFamily="Consolas"
-                                     FontSize="12"
-                                     MinHeight="100" />
-                        </ScrollViewer>
-                    </StackPanel>
-                </Border>
-
-            </StackPanel>
-        </ScrollViewer>
-    </Grid>
+            <Frame x:Name="ContentFrame" Grid.Row="1" />
+        </Grid>
+    </NavigationView>
 </Window>

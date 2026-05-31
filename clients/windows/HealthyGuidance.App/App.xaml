@@ -8,9 +8,16 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
-                <!-- Other merged dictionaries here -->
             </ResourceDictionary.MergedDictionaries>
-            <!-- Other app resources here -->
+
+            <x:Double x:Key="ControlContentThemeFontSize">16</x:Double>
+            <x:Double x:Key="BodyTextBlockFontSize">16</x:Double>
+            <x:Double x:Key="BodyStrongTextBlockFontSize">16</x:Double>
+            <x:Double x:Key="CaptionTextBlockFontSize">14</x:Double>
+            <x:Double x:Key="SubtitleTextBlockFontSize">22</x:Double>
+            <x:Double x:Key="TitleTextBlockFontSize">32</x:Double>
+            <x:Double x:Key="TitleLargeTextBlockFontSize">42</x:Double>
+            <x:Double x:Key="NavigationViewItemOnLeftIconBoxHeight">22</x:Double>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

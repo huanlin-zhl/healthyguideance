@@ -3,13 +3,13 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 
-namespace HealthyGuidance.App;
+namespace HealthyGuidance.App.Pages;
 
-public sealed partial class SettingsWindow : Window
+public sealed partial class SettingsPage : Page
 {
-    public event EventHandler? Saved;
+    private DevPanelWindow? _devPanelWindow;
 
-    public SettingsWindow()
+    public SettingsPage()
     {
         InitializeComponent();
         var current = SettingsStore.Load();
@@ -56,8 +56,8 @@ public sealed partial class SettingsWindow : Window
         try
         {
             SettingsStore.Save(settings);
-            Saved?.Invoke(this, EventArgs.Empty);
-            Close();
+            UpdateMaskedKey(settings.ApiKey);
+            StatusText.Text = "已保存";
         }
         catch (Exception ex)
         {
@@ -65,5 +65,15 @@ public sealed partial class SettingsWindow : Window
         }
     }
 
-    private void CancelButton_Click(object sender, RoutedEventArgs e) => Close();
+    private void OpenDevPanelButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_devPanelWindow != null)
+        {
+            _devPanelWindow.Activate();
+            return;
+        }
+        _devPanelWindow = new DevPanelWindow();
+        _devPanelWindow.Closed += (_, _) => _devPanelWindow = null;
+        _devPanelWindow.Activate();
+    }
 }

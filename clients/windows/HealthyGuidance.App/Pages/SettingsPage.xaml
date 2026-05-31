@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="HealthyGuidance.App.Pages.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer Padding="24,16,24,24" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="16" MaxWidth="720" HorizontalAlignment="Stretch">
+
+            <TextBlock Text="设置" FontSize="28" FontWeight="SemiBold" />
+
+            <TextBlock Text="Azure AI Foundry 配置"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       Margin="0,8,0,0" />
+
+            <StackPanel Spacing="4">
+                <TextBlock Text="Endpoint" FontWeight="SemiBold" />
+                <TextBlock Text="格式：https://&lt;resource&gt;.services.ai.azure.com/openai/v1"
+                           Opacity="0.6"
+                           FontSize="12" />
+                <TextBox x:Name="EndpointBox" PlaceholderText="https://...services.ai.azure.com/openai/v1" />
+            </StackPanel>
+
+            <StackPanel Spacing="4">
+                <TextBlock Text="Deployment Name" FontWeight="SemiBold" />
+                <TextBlock Text="如 gpt-4o-mini" Opacity="0.6" FontSize="12" />
+                <TextBox x:Name="DeploymentBox" PlaceholderText="gpt-4o-mini" />
+            </StackPanel>
+
+            <StackPanel Spacing="4">
+                <TextBlock Text="API Key" FontWeight="SemiBold" />
+                <TextBlock Text="存储位置：%LocalAppData%\HealthyGuidance\config\secrets.dat（DPAPI 加密）"
+                           Opacity="0.6"
+                           FontSize="12" />
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <PasswordBox Grid.Column="0"
+                                 x:Name="ApiKeyBox"
+                                 PlaceholderText="粘贴 API key" />
+                    <ToggleButton Grid.Column="1"
+                                  x:Name="ShowKeyToggle"
+                                  Content="显示"
+                                  Checked="ShowKeyToggle_Checked"
+                                  Unchecked="ShowKeyToggle_Unchecked" />
+                </Grid>
+                <TextBlock x:Name="MaskedKeyText"
+                           Opacity="0.6"
+                           FontSize="12"
+                           Text="" />
+            </StackPanel>
+
+            <TextBlock x:Name="StatusText"
+                       Text=""
+                       Opacity="0.8" />
+
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button x:Name="SaveButton"
+                        Content="保存"
+                        Style="{ThemeResource AccentButtonStyle}"
+                        Click="SaveButton_Click" />
+            </StackPanel>
+
+            <Border Padding="12"
+                    CornerRadius="6"
+                    BorderThickness="1"
+                    BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                    Margin="0,16,0,0">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="开发者" FontWeight="SemiBold" Opacity="0.8" />
+                    <TextBlock Text="临时测试面板，用于直接调用解析/存储接口。" Opacity="0.6" FontSize="12" />
+                    <Button x:Name="OpenDevPanelButton"
+                            Content="打开测试面板"
+                            Click="OpenDevPanelButton_Click" />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>
