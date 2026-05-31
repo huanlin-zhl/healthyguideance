@@ -112,6 +112,29 @@ public static class RecordStore
         return new SaveFailureResult { Outcome = SaveOutcome.Created, Record = record };
     }
 
+    public static SavedRecord UpdateData(SavedRecord record, JsonObject newData)
+    {
+        var updated = new SavedRecord
+        {
+            Id = record.Id,
+            Kind = record.Kind,
+            SavedAt = record.SavedAt,
+            ImageFile = record.ImageFile,
+            ImageSha256 = record.ImageSha256,
+            Parse = record.Parse,
+            Data = newData,
+            DirectoryPath = record.DirectoryPath
+        };
+        WriteParsedJson(record.DirectoryPath, updated);
+        return updated;
+    }
+
+    public static void DeleteFailed(FailedRecord record)
+    {
+        if (Directory.Exists(record.DirectoryPath))
+            Directory.Delete(record.DirectoryPath, recursive: true);
+    }
+
     public static SavedRecord PromoteFailureToSuccess(
         string failureId,
         RecordKind kind,
@@ -167,6 +190,21 @@ public static class RecordStore
         {
             var t = ExtractTimestampFromId(rec.Id);
             if (t >= start && t <= end) yield return rec;
+        }
+    }
+
+    public static IEnumerable<SavedRecord> ListAll() => ListAllUnder(StorageRoot.RecordsDir, TryReadParsedJson);
+
+    public static IEnumerable<FailedRecord> ListAllFailed() => ListAllUnder(StorageRoot.FailedDir, TryReadErrorJson);
+
+    private static IEnumerable<T> ListAllUnder<T>(string root, Func<string, T?> reader) where T : class
+    {
+        if (!Directory.Exists(root)) yield break;
+        foreach (var monthDir in Directory.EnumerateDirectories(root))
+        foreach (var dir in Directory.EnumerateDirectories(monthDir))
+        {
+            var rec = reader(dir);
+            if (rec is not null) yield return rec;
         }
     }
 
