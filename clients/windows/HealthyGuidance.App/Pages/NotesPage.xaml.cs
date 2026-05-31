@@ -19,10 +19,13 @@ public sealed partial class NotesPage : Page
     protected override void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        ReloadHistory();
+        if (MonthsPanel is not null) ReloadHistory();
     }
 
-    public void ReloadFromHost() => ReloadHistory();
+    public void ReloadFromHost()
+    {
+        if (MonthsPanel is not null) ReloadHistory();
+    }
 
     private void SaveButton_Click(object sender, RoutedEventArgs e)
     {
