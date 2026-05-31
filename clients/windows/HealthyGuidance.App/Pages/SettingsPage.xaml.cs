@@ -19,6 +19,18 @@ public sealed partial class SettingsPage : Page
         UpdateMaskedKey(current.ApiKey);
     }
 
+    protected override void OnNavigatedTo(Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+        if (e.Parameter is string s && s == "unconfigured")
+            ShowUnconfiguredHint();
+    }
+
+    public void ShowUnconfiguredHint()
+    {
+        if (UnconfiguredHint is not null) UnconfiguredHint.IsOpen = true;
+    }
+
     private void UpdateMaskedKey(string apiKey)
     {
         MaskedKeyText.Text = string.IsNullOrEmpty(apiKey)
@@ -57,6 +69,7 @@ public sealed partial class SettingsPage : Page
         {
             SettingsStore.Save(settings);
             UpdateMaskedKey(settings.ApiKey);
+            if (UnconfiguredHint is not null) UnconfiguredHint.IsOpen = false;
             StatusText.Text = "已保存";
         }
         catch (Exception ex)

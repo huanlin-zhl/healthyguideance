@@ -1,4 +1,5 @@
 using HealthyGuidance.App.Pages;
+using HealthyGuidance.Core.Settings;
 using HealthyGuidance.Core.Storage;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -12,8 +13,17 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        NavView.SelectedItem = NavView.MenuItems[0];
-        NavigateTo("overview");
+
+        if (!SettingsStore.Load().IsConfigured)
+        {
+            NavView.SelectedItem = NavView.SettingsItem;
+            NavigateTo("settings", showUnconfiguredHint: true);
+        }
+        else
+        {
+            NavView.SelectedItem = NavView.MenuItems[0];
+            NavigateTo("overview");
+        }
     }
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -27,7 +37,7 @@ public sealed partial class MainWindow : Window
             NavigateTo(tag);
     }
 
-    private void NavigateTo(string tag)
+    private void NavigateTo(string tag, bool showUnconfiguredHint = false)
     {
         Type? pageType = tag switch
         {
@@ -38,8 +48,13 @@ public sealed partial class MainWindow : Window
             "settings" => typeof(SettingsPage),
             _ => null
         };
-        if (pageType is null || ContentFrame.CurrentSourcePageType == pageType) return;
-        ContentFrame.Navigate(pageType, null, new EntranceNavigationTransitionInfo());
+        if (pageType is null) return;
+        var alreadyThere = ContentFrame.CurrentSourcePageType == pageType;
+        if (!alreadyThere)
+            ContentFrame.Navigate(pageType, showUnconfiguredHint ? "unconfigured" : null,
+                new EntranceNavigationTransitionInfo());
+        else if (showUnconfiguredHint && ContentFrame.Content is SettingsPage existing)
+            existing.ShowUnconfiguredHint();
     }
 
     private async void ImportButton_Click(object sender, RoutedEventArgs e)
