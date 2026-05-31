@@ -49,7 +49,7 @@
 │  - Prompts（PromptLoader）                  │
 │  - Schemas（SchemaLoader）                  │
 │  - Models（数据模型）                       │
-│  - 引用 Azure.AI.OpenAI                     │
+│  - 引用 OpenAI SDK                          │
 └─────────────────────────────────────────────┘
               │ HTTPS
               ▼
@@ -71,8 +71,8 @@ Core 类库**刻意不依赖 UI 与 Windows**：
 | Windows App SDK | Microsoft.WindowsAppSDK | 2.1.3 |
 | 项目模板 | Unpackaged（`<WindowsPackageType>None</WindowsPackageType>`） | — |
 | MVVM | CommunityToolkit.Mvvm | 8.4.2 |
-| Azure OpenAI SDK | Azure.AI.OpenAI | 2.1.0 |
-| Azure OpenAI API 版本 | 2024-10-21 或更新稳定版 | — |
+| Azure OpenAI SDK | OpenAI (官方包，通过 Azure AI Foundry v1 兼容 endpoint) | 2.1.0 |
+| Azure AI Foundry endpoint | `https://<resource>.services.ai.azure.com/openai/v1` | — |
 | 模型部署 | gpt-4o (vision-enabled) | 部署在 Azure AI Foundry |
 
 ## 5. 项目目录结构

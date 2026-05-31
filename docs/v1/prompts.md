@@ -8,11 +8,11 @@
 |---|---|
 | 模板存放 | `shared/prompts/*.md`（多端共享） |
 | 变量替换 | Markdown 中用 `{占位符}` 标记，代码 `string.Replace()` 替换 |
-| 输出格式 | Azure OpenAI **Structured Outputs**（`response_format: json_schema`，严格模式） |
+| 输出格式 | OpenAI **Structured Outputs**（`ChatResponseFormat.CreateJsonSchemaFormat`，严格模式） |
 | Schema 文件 | `shared/schemas/*.json`，作为 SoT（唯一真实源），prompt 不重复列字段 |
 | Prompt 语言 | 中文（系统提示 + 用户消息）；字段名（JSON key）英文；字段值保留中文 |
-| 模型 | `gpt-4o`（vision-enabled） |
-| API 版本 | `2024-10-21` 或更新的稳定版 |
+| 模型 | `gpt-4o-mini`（vision-enabled，可升级到 `gpt-4o`） |
+| SDK | `OpenAI` 官方包，通过 Azure AI Foundry v1 兼容 endpoint 调用 |
 
 ## 2. 调用清单
 
@@ -65,21 +65,28 @@
 var systemPrompt = LoadPrompt("parse.md");
 var schema = LoadSchema("parse-result.json");  // 见 §3.5
 
-var response = await client.GetChatCompletionsAsync(new ChatCompletionsOptions {
-    DeploymentName = "gpt-4o",
-    Messages = {
-        new ChatRequestSystemMessage(systemPrompt),
-        new ChatRequestUserMessage(
+var client = new ChatClient(
+    credential: new ApiKeyCredential(apiKey),
+    model: "gpt-4o-mini",
+    options: new OpenAIClientOptions { Endpoint = new Uri(endpoint) }
+);
+
+var completion = await client.CompleteChatAsync(
+    new ChatMessage[] {
+        new SystemChatMessage(systemPrompt),
+        new UserChatMessage(
             ChatMessageContentPart.CreateTextPart("请解析这张截图。"),
             ChatMessageContentPart.CreateImagePart(BinaryData.FromBytes(imageBytes), "image/png")
         )
     },
-    ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
-        name: "parse_result",
-        jsonSchema: BinaryData.FromString(schema),
-        strict: true
-    )
-});
+    new ChatCompletionOptions {
+        ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+            jsonSchemaFormatName: "parse_result",
+            jsonSchema: BinaryData.FromString(schema),
+            jsonSchemaIsStrict: true
+        )
+    }
+);
 ```
 
 ### 3.5 输出 Schema

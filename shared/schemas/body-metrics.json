@@ -23,7 +23,20 @@
     "body_shape":                  { "type": ["string", "null"], "description": "身体形态原文，如 苹果型 / 匀称型" },
     "muscle_distribution": {
       "type": ["object", "null"],
-      "description": "分肢骨骼肌量，kg；截图未提供则整体填 null",
+      "description": "分肢骨骼肌量，kg；来自顶部标注'骨骼肌 XX 公斤'的人体图；截图未提供则整体填 null",
+      "additionalProperties": false,
+      "properties": {
+        "right_arm": { "type": "number", "description": "右上肢" },
+        "left_arm":  { "type": "number", "description": "左上肢" },
+        "trunk":     { "type": "number", "description": "躯干" },
+        "right_leg": { "type": "number", "description": "右下肢" },
+        "left_leg":  { "type": "number", "description": "左下肢" }
+      },
+      "required": ["right_arm", "left_arm", "trunk", "right_leg", "left_leg"]
+    },
+    "fat_distribution": {
+      "type": ["object", "null"],
+      "description": "分肢脂肪量，kg；来自顶部标注'脂肪 XX 公斤'的人体图；截图未提供则整体填 null",
       "additionalProperties": false,
       "properties": {
         "right_arm": { "type": "number", "description": "右上肢" },
@@ -45,7 +58,7 @@
     "limb_skeletal_muscle_index", "waist_hip_ratio_est",
     "body_age", "heart_rate_bpm", "bmr_kcal",
     "water_pct", "bone_salt_kg", "protein_pct", "lean_body_mass_kg",
-    "body_type", "body_shape", "muscle_distribution",
+    "body_type", "body_shape", "muscle_distribution", "fat_distribution",
     "body_score", "app_summary_text",
     "source_app", "device"
   ]

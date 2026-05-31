@@ -46,28 +46,14 @@ shared/schemas/
 | `calories_text` | string | ✅ | — | 消耗热量原文（如 `861 千卡`） |
 | `avg_heart_rate` | integer \| null | ❌ | bpm | 平均心率（纯数字） |
 | `max_heart_rate` | integer \| null | ❌ | bpm | 最大心率（纯数字） |
-| `hr_zones` | object \| null | ❌ | 各项分钟 | 心率区间分布 |
-| `hr_zones.extreme` | integer | — | 分钟 | 极限 |
-| `hr_zones.anaerobic` | integer | — | 分钟 | 无氧耐力 |
-| `hr_zones.aerobic` | integer | — | 分钟 | 有氧耐力 |
-| `hr_zones.fat_burn` | integer | — | 分钟 | 燃脂 |
-| `hr_zones.warmup` | integer | — | 分钟 | 热身 |
-| `aerobic_te` | number \| null | ❌ | — | 有氧训练压力（纯数字） |
-| `recovery_text` | string \| null | ❌ | — | 恢复时间原文（如 `17 小时`） |
+| `hr_zones` | object \| null | ❌ | 原文字符串 | 心率区间分布 |
+| `hr_zones.extreme` | string | — | — | 极限（如 `"0 分钟"`） |
+| `hr_zones.anaerobic` | string | — | — | 无氧耐力（如 `"0 分钟"`） |
+| `hr_zones.aerobic` | string | — | — | 有氧耐力（如 `"6 分钟"`） |
+| `hr_zones.fat_burn` | string | — | — | 燃脂（如 `"29 分钟"`） |
+| `hr_zones.warmup` | string | — | — | 热身（如 `"10 分钟"`） |
 | `distance_text` | string \| null | ❌ | — | 距离原文（如 `30.85 公里` / `1000 米`） |
 | `avg_pace_or_speed` | string \| null | ❌ | — | 配速或平均速度原文（`5'46"/km` 或 `19.60 km/h`） |
-| `ascent_text` | string \| null | ❌ | — | 累计爬升原文（如 `87.0 米`） |
-| `descent_text` | string \| null | ❌ | — | 累计下降原文（如 `96.8 米`） |
-| `max_speed_text` | string \| null | ❌ | — | 最快速度原文（如 `37.08 公里/小时`） |
-| `min_speed_text` | string \| null | ❌ | — | 最慢速度原文（如 `3.24 公里/小时`） |
-| `stroke` | string \| null | ❌ | — | 主泳姿（`蛙泳`/`自由泳`/`仰泳`/`蝶泳`） |
-| `pool_length_text` | string \| null | ❌ | — | 泳池长度原文（如 `25 米`） |
-| `laps` | integer \| null | ❌ | — | 趟数（纯数字） |
-| `stroke_count` | integer \| null | ❌ | — | 划水次数（纯数字） |
-| `stroke_rate` | integer \| null | ❌ | 次/分钟 | 划水频率（纯数字） |
-| `swolf` | integer \| null | ❌ | — | 游泳效率指标（纯数字） |
-| `source_app` | string \| null | ❌ | — | 数据来源 app（`华为运动健康` 等） |
-| `device` | string \| null | ❌ | — | 设备型号（`HUAWEI WATCH GT 3 Pro` 等） |
 
 ### 4.2 JSON Schema（草案）
 
@@ -88,39 +74,21 @@ shared/schemas/
       "type": ["object", "null"],
       "additionalProperties": false,
       "properties": {
-        "extreme":   { "type": "integer" },
-        "anaerobic": { "type": "integer" },
-        "aerobic":   { "type": "integer" },
-        "fat_burn":  { "type": "integer" },
-        "warmup":    { "type": "integer" }
+        "extreme":   { "type": "string" },
+        "anaerobic": { "type": "string" },
+        "aerobic":   { "type": "string" },
+        "fat_burn":  { "type": "string" },
+        "warmup":    { "type": "string" }
       },
       "required": ["extreme", "anaerobic", "aerobic", "fat_burn", "warmup"]
     },
-    "aerobic_te":         { "type": ["number", "null"] },
-    "recovery_text":      { "type": ["string", "null"] },
     "distance_text":      { "type": ["string", "null"] },
-    "avg_pace_or_speed":  { "type": ["string", "null"] },
-    "ascent_text":        { "type": ["string", "null"] },
-    "descent_text":       { "type": ["string", "null"] },
-    "max_speed_text":     { "type": ["string", "null"] },
-    "min_speed_text":     { "type": ["string", "null"] },
-    "stroke":             { "type": ["string", "null"] },
-    "pool_length_text":   { "type": ["string", "null"] },
-    "laps":               { "type": ["integer", "null"] },
-    "stroke_count":       { "type": ["integer", "null"] },
-    "stroke_rate":        { "type": ["integer", "null"] },
-    "swolf":              { "type": ["integer", "null"] },
-    "source_app":         { "type": ["string", "null"] },
-    "device":             { "type": ["string", "null"] }
+    "avg_pace_or_speed":  { "type": ["string", "null"] }
   },
   "required": [
     "date_time", "sport_type", "duration_text", "calories_text",
     "avg_heart_rate", "max_heart_rate", "hr_zones",
-    "aerobic_te", "recovery_text",
-    "distance_text", "avg_pace_or_speed",
-    "ascent_text", "descent_text", "max_speed_text", "min_speed_text",
-    "stroke", "pool_length_text", "laps", "stroke_count", "stroke_rate", "swolf",
-    "source_app", "device"
+    "distance_text", "avg_pace_or_speed"
   ]
 }
 ```
@@ -160,12 +128,18 @@ date_time, sport_type, duration_text, calories_text
 | `lean_body_mass_kg` | number \| null | ❌ | kg | 去脂体重 |
 | `body_type` | string \| null | ❌ | — | 身体类型（原文，如`肥胖型`） |
 | `body_shape` | string \| null | ❌ | — | 身体形态（原文，如`苹果型`） |
-| `muscle_distribution` | object \| null | ❌ | kg | 分肢骨骼肌量 |
+| `muscle_distribution` | object \| null | ❌ | kg | 分肢骨骼肌量（来自"骨骼肌 XX 公斤"那张图） |
 | `muscle_distribution.right_arm` | number | — | kg | 右上肢 |
 | `muscle_distribution.left_arm` | number | — | kg | 左上肢 |
 | `muscle_distribution.trunk` | number | — | kg | 躯干 |
 | `muscle_distribution.right_leg` | number | — | kg | 右下肢 |
 | `muscle_distribution.left_leg` | number | — | kg | 左下肢 |
+| `fat_distribution` | object \| null | ❌ | kg | 分肢脂肪量（来自"脂肪 XX 公斤"那张图） |
+| `fat_distribution.right_arm` | number | — | kg | 右上肢 |
+| `fat_distribution.left_arm` | number | — | kg | 左上肢 |
+| `fat_distribution.trunk` | number | — | kg | 躯干 |
+| `fat_distribution.right_leg` | number | — | kg | 右下肢 |
+| `fat_distribution.left_leg` | number | — | kg | 左下肢 |
 | `body_score` | integer \| null | ❌ | — | 身体得分（如华为的"71 分"） |
 | `app_summary_text` | string \| null | ❌ | — | 体脂秤 app 自带的中文小结，**仅存档不参与分析** |
 | `source_app` | string \| null | ❌ | — | 数据来源 app |
