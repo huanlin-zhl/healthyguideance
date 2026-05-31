@@ -6,8 +6,47 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <StackPanel Padding="24" Spacing="12">
-        <TextBlock Text="记录" FontSize="28" FontWeight="SemiBold" />
-        <TextBlock Text="（完整时间轴 + 全部/运动/体成分/失败 筛选，待实现）" Opacity="0.6" />
-    </StackPanel>
+
+    <Grid Padding="24,16,24,0" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0"
+                       Text="记录"
+                       FontSize="28"
+                       FontWeight="SemiBold" />
+            <TextBlock Grid.Column="1"
+                       x:Name="SummaryText"
+                       VerticalAlignment="Bottom"
+                       Opacity="0.6" />
+        </Grid>
+
+        <Border Grid.Row="1"
+                Padding="4"
+                CornerRadius="8"
+                BorderThickness="1"
+                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                HorizontalAlignment="Left">
+            <StackPanel x:Name="FilterPanel" Orientation="Horizontal" Spacing="4">
+                <RadioButton x:Name="FilterAll" Content="全部" GroupName="recordsFilter" IsChecked="True" Tag="all" Checked="Filter_Checked" />
+                <RadioButton x:Name="FilterWorkout" Content="运动" GroupName="recordsFilter" Tag="workout" Checked="Filter_Checked" />
+                <RadioButton x:Name="FilterBody" Content="体成分" GroupName="recordsFilter" Tag="body" Checked="Filter_Checked" />
+                <RadioButton x:Name="FilterFailed" Content="失败" GroupName="recordsFilter" Tag="failed" Checked="Filter_Checked" />
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto"
+                      Padding="0,0,0,16">
+            <StackPanel x:Name="RecordsPanel" Spacing="8" />
+        </ScrollViewer>
+    </Grid>
 </Page>
