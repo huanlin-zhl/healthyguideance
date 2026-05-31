@@ -56,6 +56,20 @@ public static class NotesStore
         return ParseMonthFile(path).OrderBy(n => n.Timestamp).ToList();
     }
 
+    public static IReadOnlyList<string> EnumerateExistingMonths()
+    {
+        if (!Directory.Exists(StorageRoot.NotesDir)) return Array.Empty<string>();
+        return Directory.EnumerateFiles(StorageRoot.NotesDir, "*.txt")
+            .Select(p => Path.GetFileNameWithoutExtension(p)!)
+            .Where(IsValidMonthKey)
+            .OrderByDescending(m => m, StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private static bool IsValidMonthKey(string s) =>
+        DateTime.TryParseExact(s, "yyyy-MM",
+            CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
+
     private static string MonthFilePath(DateTime localTime) =>
         Path.Combine(StorageRoot.NotesDir, StorageRoot.MonthKey(localTime) + ".txt");
 
