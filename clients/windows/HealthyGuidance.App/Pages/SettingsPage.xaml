@@ -74,6 +74,31 @@
                         Click="SaveButton_Click" />
             </StackPanel>
 
+            <TextBlock Text="个人目标"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       Margin="0,16,0,0" />
+            <TextBlock Text="用于生成分析报告时随 prompt 一起传给 GPT，0 表示未设置。"
+                       Opacity="0.6"
+                       FontSize="12" />
+
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="目标体重 (kg)" FontWeight="SemiBold" />
+                    <NumberBox x:Name="GoalWeightBox"
+                               SpinButtonPlacementMode="Hidden"
+                               Width="160"
+                               Minimum="0" />
+                </StackPanel>
+                <StackPanel Spacing="4">
+                    <TextBlock Text="目标体脂率 (%)" FontWeight="SemiBold" />
+                    <NumberBox x:Name="GoalBodyFatBox"
+                               SpinButtonPlacementMode="Hidden"
+                               Width="160"
+                               Minimum="0" />
+                </StackPanel>
+            </StackPanel>
+
             <Border Padding="12"
                     CornerRadius="6"
                     BorderThickness="1"

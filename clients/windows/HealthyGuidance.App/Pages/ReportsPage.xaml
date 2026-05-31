@@ -6,8 +6,40 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <StackPanel Padding="24" Spacing="12">
-        <TextBlock Text="报告" FontSize="28" FontWeight="SemiBold" />
-        <TextBlock Text="（报告卡片列表 + 生成新报告流程，待实现）" Opacity="0.6" />
-    </StackPanel>
+
+    <Grid Padding="24,16,24,0" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0"
+                       Text="报告"
+                       FontSize="28"
+                       FontWeight="SemiBold" />
+            <TextBlock Grid.Column="1"
+                       x:Name="SummaryText"
+                       VerticalAlignment="Bottom"
+                       Opacity="0.6" />
+        </Grid>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+            <Button x:Name="GenerateButton"
+                    Content="+ 生成新报告"
+                    Style="{ThemeResource AccentButtonStyle}"
+                    Click="GenerateButton_Click" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Auto"
+                      Padding="0,0,0,16">
+            <StackPanel x:Name="ReportsPanel" Spacing="8" />
+        </ScrollViewer>
+    </Grid>
 </Page>

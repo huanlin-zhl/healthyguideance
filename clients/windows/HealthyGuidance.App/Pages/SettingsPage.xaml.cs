@@ -16,6 +16,8 @@ public sealed partial class SettingsPage : Page
         EndpointBox.Text = current.Endpoint;
         DeploymentBox.Text = current.DeploymentName;
         ApiKeyBox.Password = current.ApiKey;
+        GoalWeightBox.Value = current.GoalWeightKg == 0 ? double.NaN : current.GoalWeightKg;
+        GoalBodyFatBox.Value = current.GoalBodyFatPct == 0 ? double.NaN : current.GoalBodyFatPct;
         UpdateMaskedKey(current.ApiKey);
     }
 
@@ -56,7 +58,9 @@ public sealed partial class SettingsPage : Page
         {
             Endpoint = EndpointBox.Text.Trim(),
             DeploymentName = DeploymentBox.Text.Trim(),
-            ApiKey = ApiKeyBox.Password.Trim()
+            ApiKey = ApiKeyBox.Password.Trim(),
+            GoalWeightKg = double.IsNaN(GoalWeightBox.Value) ? 0 : GoalWeightBox.Value,
+            GoalBodyFatPct = double.IsNaN(GoalBodyFatBox.Value) ? 0 : GoalBodyFatBox.Value
         };
 
         if (!settings.IsConfigured)
