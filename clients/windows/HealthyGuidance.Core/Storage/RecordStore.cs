@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -12,6 +13,7 @@ public static class RecordStore
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         Converters = { new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower) }
     };
 
@@ -20,6 +22,10 @@ public static class RecordStore
         var hash = SHA256.HashData(bytes);
         return Convert.ToHexString(hash).ToLowerInvariant();
     }
+
+    public static SavedRecord? TryFindExistingBySha(string sha) => FindRecordBySha(sha);
+
+    public static FailedRecord? TryFindFailedBySha(string sha) => FindFailedBySha(sha);
 
     public static SaveSuccessResult SaveSuccess(
         byte[] imageBytes,

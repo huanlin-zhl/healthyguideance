@@ -7,49 +7,151 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="HealthyGuidance - 截图解析测试">
+    Title="HealthyGuidance - 测试面板">
 
     <Window.SystemBackdrop>
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid Padding="24" RowDefinitions="Auto,Auto,*,Auto,*">
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
-            <Button x:Name="PickAndParseButton" Content="选择截图并解析" Click="PickAndParseButton_Click" />
-            <Button x:Name="ReloadPromptButton" Content="重新加载 Prompt" Click="ReloadPromptButton_Click" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0"
+                    Orientation="Horizontal"
+                    Spacing="12"
+                    Padding="16,12">
             <Button x:Name="SettingsButton" Content="⚙ 设置" Click="SettingsButton_Click" />
-            <TextBlock x:Name="StatusText" VerticalAlignment="Center" Text="就绪" />
+            <Button x:Name="ReloadPromptButton" Content="重新加载 Prompt" Click="ReloadPromptButton_Click" />
+            <Button x:Name="OpenDataFolderButton" Content="📂 打开数据目录" Click="OpenDataFolderButton_Click" />
+            <TextBlock x:Name="GlobalStatusText" VerticalAlignment="Center" Text="就绪" Opacity="0.7" />
         </StackPanel>
 
-        <Expander Grid.Row="1"
-                  Margin="0,16,0,0"
-                  HorizontalAlignment="Stretch"
-                  IsExpanded="False">
-            <Expander.Header>
-                <TextBlock x:Name="PromptHeader" Text="System Prompt（点击展开）" FontWeight="SemiBold" />
-            </Expander.Header>
-            <ScrollViewer VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Auto"
-                          MaxHeight="300">
-                <TextBox x:Name="PromptBox"
-                         IsReadOnly="True"
-                         AcceptsReturn="True"
-                         TextWrapping="NoWrap"
-                         FontFamily="Consolas"
-                         FontSize="12" />
-            </ScrollViewer>
-        </Expander>
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      Padding="16,0,16,16">
+            <StackPanel Spacing="20" MaxWidth="900" HorizontalAlignment="Stretch">
 
-        <TextBlock Grid.Row="3" Margin="0,16,0,8" FontWeight="SemiBold" Text="返回 JSON：" />
+                <!-- Panel: System prompt preview -->
+                <Expander HorizontalAlignment="Stretch" IsExpanded="False">
+                    <Expander.Header>
+                        <TextBlock x:Name="PromptHeader" Text="System Prompt（点击展开）" FontWeight="SemiBold" />
+                    </Expander.Header>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="280">
+                        <TextBox x:Name="PromptBox"
+                                 IsReadOnly="True"
+                                 AcceptsReturn="True"
+                                 TextWrapping="NoWrap"
+                                 FontFamily="Consolas"
+                                 FontSize="12" />
+                    </ScrollViewer>
+                </Expander>
 
-        <ScrollViewer Grid.Row="4" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            <TextBox x:Name="ResultBox"
-                     IsReadOnly="True"
-                     AcceptsReturn="True"
-                     TextWrapping="NoWrap"
-                     FontFamily="Consolas"
-                     FontSize="13"
-                     MinHeight="300" />
+                <!-- Panel 1: Parse only (existing) -->
+                <Border Padding="16" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="① 解析截图（不落盘）" FontSize="16" FontWeight="SemiBold" />
+                        <TextBlock Text="选一张截图，调用 GPT，仅显示返回 JSON，不写入磁盘。" Opacity="0.7" FontSize="12" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button x:Name="ParseOnlyButton" Content="选择截图并解析" Click="ParseOnlyButton_Click" />
+                            <TextBlock x:Name="ParseOnlyStatus" VerticalAlignment="Center" Opacity="0.7" />
+                        </StackPanel>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="260">
+                            <TextBox x:Name="ParseOnlyResultBox"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+                                     TextWrapping="NoWrap"
+                                     FontFamily="Consolas"
+                                     FontSize="12"
+                                     MinHeight="120" />
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+
+                <!-- Panel 2: Parse + persist -->
+                <Border Padding="16" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="② 解析 + 落盘（成功走 records/，失败走 failed/）" FontSize="16" FontWeight="SemiBold" />
+                        <TextBlock Text="选截图 → 调用 GPT → 写入 RecordStore；重复同一张图会跳过。" Opacity="0.7" FontSize="12" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button x:Name="ParseAndSaveButton" Content="选择截图并落盘" Click="ParseAndSaveButton_Click" />
+                            <TextBlock x:Name="ParseAndSaveStatus" VerticalAlignment="Center" Opacity="0.7" />
+                        </StackPanel>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="260">
+                            <TextBox x:Name="ParseAndSaveResultBox"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+                                     TextWrapping="NoWrap"
+                                     FontFamily="Consolas"
+                                     FontSize="12"
+                                     MinHeight="120" />
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+
+                <!-- Panel 3: Notes append -->
+                <Border Padding="16" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="③ 写入饮食备注" FontSize="16" FontWeight="SemiBold" />
+                        <TextBlock Text="时间戳用当前时刻，到分钟；按当前月归档到 notes/&lt;yyyy-MM&gt;.txt" Opacity="0.7" FontSize="12" />
+                        <TextBox x:Name="NoteInputBox"
+                                 PlaceholderText="今天中午吃了..."
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 MinHeight="80" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button x:Name="AppendNoteButton" Content="追加备注" Click="AppendNoteButton_Click" />
+                            <TextBlock x:Name="AppendNoteStatus" VerticalAlignment="Center" Opacity="0.7" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Panel 4: Browse records -->
+                <Border Padding="16" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="④ 浏览记录" FontSize="16" FontWeight="SemiBold" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="月份(YYYY-MM)：" VerticalAlignment="Center" />
+                            <TextBox x:Name="BrowseMonthBox" Width="120" />
+                            <Button x:Name="ListRecordsButton" Content="列出成功记录" Click="ListRecordsButton_Click" />
+                            <Button x:Name="ListFailedButton" Content="列出失败记录" Click="ListFailedButton_Click" />
+                        </StackPanel>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="220">
+                            <TextBox x:Name="BrowseRecordsBox"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+                                     TextWrapping="NoWrap"
+                                     FontFamily="Consolas"
+                                     FontSize="12"
+                                     MinHeight="100" />
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+
+                <!-- Panel 5: Browse notes -->
+                <Border Padding="16" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="⑤ 浏览备注" FontSize="16" FontWeight="SemiBold" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="月份(YYYY-MM)：" VerticalAlignment="Center" />
+                            <TextBox x:Name="NotesMonthBox" Width="120" />
+                            <Button x:Name="ListNotesButton" Content="列出备注" Click="ListNotesButton_Click" />
+                        </StackPanel>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="220">
+                            <TextBox x:Name="BrowseNotesBox"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     FontFamily="Consolas"
+                                     FontSize="12"
+                                     MinHeight="100" />
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
         </ScrollViewer>
     </Grid>
 </Window>
