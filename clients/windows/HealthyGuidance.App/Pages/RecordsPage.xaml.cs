@@ -156,12 +156,13 @@ public sealed partial class RecordsPage : Page
 
     private Expander BuildSavedExpander(SavedRecord r)
     {
-        var view = new SavedRecordView(r, onChanged: updated =>
-        {
-            // 同步更新内存中的对象引用
-            var idx = _allSaved.FindIndex(x => x.Id == updated.Id);
-            if (idx >= 0) _allSaved[idx] = updated;
-        });
+        var view = new SavedRecordView(r,
+            onChanged: updated =>
+            {
+                var idx = _allSaved.FindIndex(x => x.Id == updated.Id);
+                if (idx >= 0) _allSaved[idx] = updated;
+            },
+            onDeleted: () => Reload());
 
         return new Expander
         {
@@ -174,7 +175,9 @@ public sealed partial class RecordsPage : Page
 
     private Expander BuildFailedExpander(FailedRecord r)
     {
-        var view = new FailedRecordView(r, onRetried: () => Reload());
+        var view = new FailedRecordView(r,
+            onRetried: () => Reload(),
+            onDeleted: () => Reload());
 
         return new Expander
         {
@@ -202,15 +205,17 @@ public sealed partial class RecordsPage : Page
     {
         private SavedRecord _record;
         private readonly Action<SavedRecord> _onChanged;
+        private readonly Action _onDeleted;
 
         public StackPanel Root { get; }
         private readonly StackPanel _headerPanel;
         private readonly TextBlock _headerText;
 
-        public SavedRecordView(SavedRecord record, Action<SavedRecord> onChanged)
+        public SavedRecordView(SavedRecord record, Action<SavedRecord> onChanged, Action onDeleted)
         {
             _record = record;
             _onChanged = onChanged;
+            _onDeleted = onDeleted;
             _headerPanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
             _headerText = new TextBlock { TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center };
             _headerPanel.Children.Add(_headerText);
@@ -245,8 +250,11 @@ public sealed partial class RecordsPage : Page
             openImageBtn.Click += (_, _) => OpenImageWithDefaultViewer();
             var editBtn = new Button { Content = "编辑" };
             editBtn.Click += (_, _) => RenderEdit();
+            var deleteBtn = new Button { Content = "删除" };
+            deleteBtn.Click += async (_, _) => await ConfirmAndDeleteAsync();
             actionBar.Children.Add(openImageBtn);
             actionBar.Children.Add(editBtn);
+            actionBar.Children.Add(deleteBtn);
             Root.Children.Add(actionBar);
 
             var groups = RecordFormatter.FormatGroups(_record);
@@ -262,6 +270,37 @@ public sealed partial class RecordsPage : Page
                 Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             }
             catch { /* 用户无关联应用，静默忽略 */ }
+        }
+
+        private async Task ConfirmAndDeleteAsync()
+        {
+            var dlg = new ContentDialog
+            {
+                Title = "删除记录？",
+                Content = "此操作不可恢复，原图与解析结果都会被删除。",
+                PrimaryButtonText = "删除",
+                CloseButtonText = "取消",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = Root.XamlRoot
+            };
+            if (await dlg.ShowAsync() != ContentDialogResult.Primary) return;
+
+            try
+            {
+                RecordStore.DeleteSaved(_record);
+                _onDeleted();
+            }
+            catch (Exception ex)
+            {
+                var err = new ContentDialog
+                {
+                    Title = "删除失败",
+                    Content = ex.Message,
+                    CloseButtonText = "好",
+                    XamlRoot = Root.XamlRoot
+                };
+                _ = err.ShowAsync();
+            }
         }
 
         // ---------- 编辑态 ----------
@@ -612,17 +651,20 @@ public sealed partial class RecordsPage : Page
     {
         private readonly FailedRecord _record;
         private readonly Action _onRetried;
+        private readonly Action _onDeleted;
 
         public StackPanel Root { get; }
         private readonly TextBlock _headerText;
         private readonly TextBlock _statusText;
         private readonly Button _retryBtn;
         private readonly Button _openImageBtn;
+        private readonly Button _deleteBtn;
 
-        public FailedRecordView(FailedRecord record, Action onRetried)
+        public FailedRecordView(FailedRecord record, Action onRetried, Action onDeleted)
         {
             _record = record;
             _onRetried = onRetried;
+            _onDeleted = onDeleted;
 
             _headerText = new TextBlock { TextWrapping = TextWrapping.Wrap };
             if (Application.Current.Resources["SystemFillColorCriticalBrush"] is Brush b)
@@ -632,8 +674,10 @@ public sealed partial class RecordsPage : Page
             _statusText = new TextBlock { Opacity = 0.7, FontSize = 12 };
             _retryBtn = new Button { Content = "重试解析" };
             _openImageBtn = new Button { Content = "打开原图" };
+            _deleteBtn = new Button { Content = "删除" };
             _openImageBtn.Click += (_, _) => OpenImageWithDefaultViewer();
             _retryBtn.Click += async (_, _) => await RetryAsync();
+            _deleteBtn.Click += async (_, _) => await ConfirmAndDeleteAsync();
 
             Root = new StackPanel { Spacing = 12, HorizontalAlignment = HorizontalAlignment.Stretch };
             var actionBar = new StackPanel
@@ -645,6 +689,7 @@ public sealed partial class RecordsPage : Page
             actionBar.Children.Add(_statusText);
             actionBar.Children.Add(_openImageBtn);
             actionBar.Children.Add(_retryBtn);
+            actionBar.Children.Add(_deleteBtn);
             Root.Children.Add(actionBar);
 
             var groups = RecordFormatter.FormatGroups(_record);
@@ -662,6 +707,37 @@ public sealed partial class RecordsPage : Page
                 Process.Start(new ProcessStartInfo { FileName = path, UseShellExecute = true });
             }
             catch { }
+        }
+
+        private async Task ConfirmAndDeleteAsync()
+        {
+            var dlg = new ContentDialog
+            {
+                Title = "删除失败记录？",
+                Content = "此操作不可恢复，原图与错误日志都会被删除。",
+                PrimaryButtonText = "删除",
+                CloseButtonText = "取消",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = Root.XamlRoot
+            };
+            if (await dlg.ShowAsync() != ContentDialogResult.Primary) return;
+
+            try
+            {
+                RecordStore.DeleteFailed(_record);
+                _onDeleted();
+            }
+            catch (Exception ex)
+            {
+                var err = new ContentDialog
+                {
+                    Title = "删除失败",
+                    Content = ex.Message,
+                    CloseButtonText = "好",
+                    XamlRoot = Root.XamlRoot
+                };
+                _ = err.ShowAsync();
+            }
         }
 
         private async Task RetryAsync()

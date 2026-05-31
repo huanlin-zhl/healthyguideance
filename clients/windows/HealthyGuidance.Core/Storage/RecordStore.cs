@@ -135,6 +135,12 @@ public static class RecordStore
             Directory.Delete(record.DirectoryPath, recursive: true);
     }
 
+    public static void DeleteSaved(SavedRecord record)
+    {
+        if (Directory.Exists(record.DirectoryPath))
+            Directory.Delete(record.DirectoryPath, recursive: true);
+    }
+
     public static SavedRecord PromoteFailureToSuccess(
         string failureId,
         RecordKind kind,
